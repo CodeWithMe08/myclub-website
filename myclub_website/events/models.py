@@ -9,7 +9,10 @@ class Venue(models.Model):
     web  = models.URLField('Website Address', blank=True)
     email_address  = models.EmailField('Email Address', blank=True)
 
+    def __str__(self):
+            return self.name
 
+            
 class MyClubUser(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
