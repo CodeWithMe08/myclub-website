@@ -5,6 +5,8 @@ from calendar import HTMLCalendar
 from datetime import datetime
 from .models import Event, Venue
 from .forms import VenueForm, EventForm
+from django.http import HttpResponse
+
 
 # Create your views here.
 def home(request, year=datetime.now().year, month=datetime.now().strftime('%B')):
@@ -121,3 +123,26 @@ def delete_event(request, event_id):
 	event = Event.objects.get(pk=event_id)
 	event.delete()
 	return redirect('list-events')		
+
+
+# Generate Text File Venue List
+def venue_text(request):
+	response = HttpResponse(content_type='text/plain')
+	response['Content-Disposition'] = 'attachment; filename=venues.txt'
+	# Designate The Model
+	venues = Venue.objects.all()
+
+	# Create blank list
+	lines = []
+	# Loop Thu and output
+	for venue in venues:
+		lines.append(f'{venue.name}\n{venue.address}\n{venue.zip_code}\n{venue.phone}\n{venue.web}\n{venue.email_address}\n\n\n')
+
+	#lines = ["This is line 1\n", 
+	#"This is line 2\n",
+	#"This is line 3\n\n",
+	#"John Elder Is Awesome!\n"]
+
+	# Write To TextFile
+	response.writelines(lines)
+	return response
