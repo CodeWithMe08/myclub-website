@@ -32,7 +32,7 @@ def home(request, year=datetime.now().year, month=datetime.now().strftime('%B'))
 
 
 def all_events(request):
-    event_list = Event.objects.all()
+    event_list = Event.objects.all().order_by('event_date')
     return render(request, 'events/event_list.html',{'event_list':event_list})
 
 
@@ -51,7 +51,7 @@ def add_venue(request):
 
 
 def list_venues(request):
-    venue_list = Venue.objects.all()
+    venue_list = Venue.objects.all().order_by('name')
     return render(request, 'events/venue.html',{'venue_list':venue_list})
 
 
@@ -109,3 +109,15 @@ def update_event(request, event_id):
 
 	return render(request, 'events/update_event.html', 
 		{'event': event,'form':form})
+
+
+def delete_venue(request, venue_id):
+	venue = Venue.objects.get(pk=venue_id)
+	venue.delete()
+	return redirect('list-venues')		
+
+
+def delete_event(request, event_id):
+	event = Event.objects.get(pk=event_id)
+	event.delete()
+	return redirect('list-events')		
