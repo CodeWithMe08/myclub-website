@@ -6,6 +6,14 @@ from datetime import datetime
 from .models import Event, Venue
 from .forms import VenueForm, EventForm
 from django.http import HttpResponse
+import csv
+# for pdf
+from django.http import FileResponse
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
+
 
 
 # Create your views here.
@@ -146,3 +154,67 @@ def venue_text(request):
 	# Write To TextFile
 	response.writelines(lines)
 	return response
+
+
+# Generate csv File Venue List
+def venue_csv(request):
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename=venues.csv'
+	# Create a csv writer
+	writer = csv.writer(response)
+    # Designate The Model
+	venues = Venue.objects.all()
+    # Add column headings to the csv file
+	writer.writerow(['Venue Name', 'Address', 'Zip Code', 'Phone', 'Web Address', 'Email'])
+
+	# Loop Thu and output
+	for venue in venues:
+		writer.writerow([venue.name, venue.address, venue.zip_code, venue.phone, venue.web, venue.email_address])
+
+	return response
+
+# Generate a PDF File Venue List
+def venue_pdf(request):
+	# Create Bytestream buffer
+	buf = io.BytesIO()
+	# Create a canvas
+	c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+	# Create a text object
+	textob = c.beginText()
+	textob.setTextOrigin(inch, inch)
+	textob.setFont("Helvetica", 14)
+
+	# Add some lines of text
+	#lines = [
+	#	"This is line 1",
+	#	"This is line 2",
+	#	"This is line 3",
+	#]
+
+	# Designate The Model
+	venues = Venue.objects.all()
+
+	# Create blank list
+	lines = []
+
+	for venue in venues:
+		lines.append(venue.name)
+		lines.append(venue.address)
+		lines.append(venue.zip_code)
+		lines.append(venue.phone)
+		lines.append(venue.web)
+		lines.append(venue.email_address)
+		lines.append("===========================")
+
+	# Loop
+	for line in lines:
+		textob.textLine(line)
+
+	# Finish Up
+	c.drawText(textob)
+	c.showPage()
+	c.save()
+	buf.seek(0)
+
+	# Return something
+	return FileResponse(buf, as_attachment=True, filename='venue.pdf')
