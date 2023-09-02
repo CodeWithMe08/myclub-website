@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
-import calendar
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+import calendar
 from calendar import HTMLCalendar
 from datetime import datetime
 from .models import Event, Venue
 from .forms import VenueForm, EventForm
-from django.http import HttpResponse
 import csv
 # Import PDF Stuff
 from django.http import FileResponse

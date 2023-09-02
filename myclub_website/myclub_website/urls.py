@@ -9,9 +9,8 @@ urlpatterns = [
     path('members/', include('members.urls')),
 ]
 
-
 # Configure Admin Titles
 admin.site.site_header = "My Club Administration Page"
 admin.site.site_title = "Browser Title"
-admin.site.index_title = "Welcome To The Addmin Area..."
+admin.site.index_title = "Welcome To The Admin Area..."
 
